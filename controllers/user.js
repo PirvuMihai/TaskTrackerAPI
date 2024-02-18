@@ -1,6 +1,7 @@
 const UserDb = require(`../models`).UserDb;
 const bcrypt = require(`bcryptjs`);
 const TaskDb = require(`../models`).TaskDb;
+const jwt = require(`jsonwebtoken`);
 
 const UserController = {
     addUser: async (req, res) => {
@@ -126,6 +127,51 @@ const UserController = {
             console.log(error);
         }
     },
+
+    login: async(req, res) => {
+        try{
+            const payload = {
+                email: req.body.email,
+                parola: req.body.parola,
+            }
+            const user = await UserDb.findOne({
+                where:{
+                    email: payload.email,
+                }
+            });
+            if(!user){
+                res.status(403).send("Email sau parola gresita!");
+                return;
+            }
+            const match = await bcrypt.compare(payload.parola, user.parola);
+            if (match) {
+                jwt.sign(
+                  user.get(),
+                  process.env.JWT_KEY,
+                  {
+                    algorithm: "HS256",
+                  },
+                  (err, token) => {
+                    if (err) {
+                      console.log(err);
+                      throw new Error("jwt");
+                    }
+                    res.cookie("bearer", token, {
+                      httpOnly: true,
+                      expire: process.env.COOKIE_AGE,
+                    });
+                    res.status(200).send({ user: user, token: token });
+                  }
+                );
+              } else {
+                res.status(403).send("Email sau parola gresita!");
+              }        
+        }catch(error){
+            res.status(500).send("Server error!");
+            console.log(error);
+        }
+    },
+
     deleteUser: async(req, res) => {
         try{
             const id = req.params.id;
