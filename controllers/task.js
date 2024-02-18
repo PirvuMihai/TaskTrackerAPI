@@ -66,6 +66,48 @@ const TaskController = {
             console.log(error);
         }
     },
+    updateTask: async(req, res) => {
+        try{
+            const id = req.params.updateId;
+            let tasks = await TaskDb.findByPk(id);
+            if(!tasks){
+                res.status(404).send("Task-ul nu a fost gasit!");
+                return;
+            }
+            let task = {
+                nume: req.body.nume,
+                dataInceput: req.body.dataInceput,
+                dataTerminare: req.body.dataTerminare,
+                descriere: req.body.descriere,
+                esteTerminat: req.body.esteTerminat,
+            }
+            let errCounter = 0;
+            let errMsg = [];
+            if(task === undefined  || !task.nume || !task.dataInceput){
+                errMsg[errCounter++] = "Va rugam completati toate campurile obligatorii!";
+            }
+            if(errCounter>0){
+                res.status(400).send(errMsg);
+                return;
+            }
+            if(new Date(task.dataInceput) == "Data invalida") {
+                errMsg[errCounter++] = "Va rugam sa introduceti o data valida";
+            }
+            if((new Date(task.dataTerminare) == "Data invalida") && (task.dataTerminare.length>0) ){
+                errMsg[errCounter++] = "Va rugam sa introduceti o data valida";
+            }
+            if(errCounter>0){
+                res.status(400).send(errMsg);
+                return;
+            }
+            await tasks.update(task);
+            res.status(200).send("Task-ul a fost modificat cu succes!");
+
+        }catch(error){
+            res.status(500).send("Server errror!");
+            console.log(error);
+        }
+    },
     deleteTask: async(req, res) => {
         try{
             const id = req.params.id;
