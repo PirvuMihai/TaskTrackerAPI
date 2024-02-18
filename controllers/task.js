@@ -108,6 +108,20 @@ const TaskController = {
             console.log(error);
         }
     },
+    taskTerminat: async(req, res) => {
+        try{
+            const id = req.params.id;
+            await TaskDb.update({esteTerminat: true}, {
+                where: {
+                    id: id,
+                }
+            })
+            res.status(200).send("Task-ul a fost inregistrat ca terminat.");
+        }catch(error){
+            res.status(500).send("Server error!");
+            console.log(error);
+        }
+    },
     deleteTask: async(req, res) => {
         try{
             const id = req.params.id;
