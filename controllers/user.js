@@ -190,23 +190,6 @@ const UserController = {
                     id: id,
                 }
             })
-            // let tasks = await TaskDb.findAll({
-            //     where:{
-            //         id_user: id,
-            //     }
-            // })
-            // if(tasks!=[]){
-            //     await TaskDb.destroy({
-            //         where:{
-            //             id_user: id,
-            //         }
-            //     });
-            // }
-            // await UserDb.destroy({
-            //     where:{
-            //         id:id,
-            //     }
-            // });
             res.status(200).send("User-ul a fost sters din baza de date");
         }catch(error){
             res.status(500).send("Server error!");

@@ -45,13 +45,31 @@ const TaskController = {
                 res.status(404).send("Nu au fost gasite task-uri!");
                 return;
             }
-            console.log("AAAAA");
             res.status(200).send(tasks);
         }catch(error){
             res.status(500).send("Server error!");
             console.log(error);
         }
     },
+
+    getAllUnfinishedTasks: async(req, res) => {
+        try{
+            let tasks = await TaskDb.findAll({
+                where:{
+                    esteTerminat: false
+                }
+            })
+            if (tasks == []) {
+                res.status(404).send("Nu au fost gasite task-uri!");
+                return;
+            }
+            res.status(200).send(tasks);
+        }catch(error){
+            res.status(500).send("Server error!");
+            console.log(error);
+        }
+    },
+
     getTaskById: async(req, res) => {
         try{
             const id = req.params.id;
